@@ -18,7 +18,7 @@ public static class Program
     
     private static readonly string RawPagesDir = Path.Combine("raw", "pages");
     
-    private static readonly string RawAssetsDir = Path.Combine("raw", "assets");
+    private static readonly string RawAssetsDir = Path.Combine("raw", "static", "assets");
 
     private static readonly string StaticPagesDir = Path.Combine("static", "pages");
     
@@ -93,20 +93,10 @@ public static class Program
 
                             string staticPage = StaticPagesDir + Path.GetDirectoryName(page);
                             Directory.CreateDirectory(staticPage);
-
-                            var pipeline = new MarkdownPipelineBuilder().Build();
-
-                            var writer = new StringWriter();
-                            var renderer = new HtmlRenderer(writer);
-                            renderer.LinkRewriter = s => $"/static{s}";
-                            pipeline.Setup(renderer);
-
-                            var document = MarkdownParser.Parse(File.ReadAllText(name), pipeline);
-                            renderer.Render(document);
-                            writer.Flush();
                             
-                            
-                            File.WriteAllText(StaticPagesDir + page + ".html", writer.ToString());
+                            var document = MarkdownParser.Parse(File.ReadAllText(name));
+
+                            File.WriteAllText(StaticPagesDir + page + ".html", document.ToHtml());
                             
                             MappedPages.Add(pageCount, page);
                             pageCount++;
